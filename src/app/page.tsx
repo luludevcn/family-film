@@ -21,7 +21,7 @@ export default function Home() {
       <Alert description={description} title={title} />
       <h1 className='text-2xl font-bold text-center py-10'>家庭影库</h1>
       <Accordion variant="splitted">
-        {videoFiles.categories.map((category) => (
+        {videoFiles.categories?.map((category) => (
           <AccordionItem key={category.name} aria-label={category.label} title={`${category.label}`} subtitle={`[1-${category.videos.length}]`}>
             <Divider></Divider>
             {category.videos.map((video, index) => (
