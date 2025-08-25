@@ -24,7 +24,7 @@ export default function videoPage() {
                 <Link href='/'><Image src={'/logo.png'}></Image></Link>
             </div>
             <div className='pt-10'>
-                <video controls className='w-full'>
+                <video controls autoPlay className='w-full'>
                     <source src={videoSrc} type="video/mp4" />
                     您的浏览器不支持 HTML5 视频标签。
                 </video>
