@@ -18,7 +18,6 @@ export async function GET(
                 /\.(json)$/i.test(file)
             );
             if (metadataFile[0]) {
-                console.log(MOVIES_BASE_DIR, category, metadataFile)
                 const metadata = fs.readFileSync(path.join(MOVIES_BASE_DIR, category, metadataFile[0]), { encoding: 'utf8' })
                 videoFiles.categories.push({ name: category, label: JSON.parse(metadata).name, videos: videos })
             } else {

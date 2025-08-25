@@ -102,7 +102,6 @@ export async function GET(
 
         // 获取 MIME 类型
         const mimeType = mime.getType(filename) || 'video/mp4';
-
         // 处理范围请求（视频流）
         const rangeInfo = parseRange(range, fileSize);
 
@@ -118,13 +117,50 @@ export async function GET(
                 'Cache-Control': 'public, max-age=31536000, immutable',
             });
 
+            let isCancelled = false;
             const stream = fs.createReadStream(filePath, { start, end });
             const readableStream = new ReadableStream({
                 start(controller) {
-                    stream.on('data', (chunk) => controller.enqueue(chunk));
-                    stream.on('end', () => controller.close());
-                    stream.on('error', (error) => controller.error(error));
+                    stream.on('data', (chunk) => {
+                        if (!isCancelled) {
+                            try {
+                                controller.enqueue(chunk);
+                            } catch (error) {
+                                // 控制器可能已关闭，忽略错误
+                                stream.destroy();
+                                isCancelled = true;
+                            }
+                        }
+                    });
+
+                    stream.on('end', () => {
+                        if (!isCancelled) {
+                            try {
+                                controller.close();
+                            } catch (error) {
+                                // 忽略关闭错误
+                            }
+                        }
+                    });
+
+                    stream.on('error', (error) => {
+                        if (!isCancelled) {
+                            try {
+                                controller.error(error);
+                            } catch (error) {
+                                // 忽略错误
+                            }
+                            isCancelled = true;
+                        }
+                    });
+                },
+
+                cancel() {
+                    // 客户端取消请求时调用
+                    isCancelled = true;
+                    stream.destroy();
                 }
+
             });
 
             return new Response(readableStream as any, {
