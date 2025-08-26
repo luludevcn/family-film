@@ -11,8 +11,11 @@ export async function GET(
         const catogaries = fs.readdirSync(MOVIES_BASE_DIR);
         catogaries.map(category => {
             const catogaryFiles = fs.readdirSync(path.join(MOVIES_BASE_DIR, category))
+            // const videos = catogaryFiles.filter((file) =>
+            //     /\.(mp4|mkv|avi|mov|wmv|flv|webm)$/i.test(file)
+            // );
             const videos = catogaryFiles.filter((file) =>
-                /\.(mp4|mkv|avi|mov|wmv|flv|webm)$/i.test(file)
+                /\.(mp4)$/i.test(file)
             );
             const metadataFile = catogaryFiles.filter((file) =>
                 /\.(json)$/i.test(file)
