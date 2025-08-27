@@ -7,21 +7,12 @@ import mime from 'mime';
 const MOVIES_BASE_DIR = process.env.MOVIE_DIR || '/path/to/your/movies';
 
 const statAsync = promisify(fs.stat);
-const readdirAsync = promisify(fs.readdir);
 
 // 支持的视频格式
 const SUPPORTED_VIDEO_EXTENSIONS = [
     '.mp4', '.mkv', '.avi', '.mov', '.wmv',
     '.flv', '.webm', '.m4v', '.ts', '.mpeg', '.mpg'
 ];
-
-// 类型定义
-interface RouteParams {
-    params: {
-        category: string;
-        filename: string;
-    };
-}
 
 // 安全的路径验证
 function isValidPathSegment(segment: string): boolean {
@@ -71,9 +62,9 @@ function parseRange(range: string | null, fileSize: number): { start: number; en
 
 export async function GET(
     request: NextRequest,
-    { params }: RouteParams
+    context: { params: Promise<{ category: string; filename: string }> }
 ) {
-    const { category, filename } = await params;
+    const { category, filename } = await context.params;
 
     // console.log(category, filename)
     // 验证 category 和 filename
@@ -163,7 +154,7 @@ export async function GET(
 
             });
 
-            return new Response(readableStream as any, {
+            return new Response(readableStream, {
                 status: 206,
                 headers,
             });
@@ -185,7 +176,7 @@ export async function GET(
                 }
             });
 
-            return new Response(readableStream as any, {
+            return new Response(readableStream, {
                 status: 200,
                 headers,
             });
@@ -212,9 +203,9 @@ export async function GET(
 // 可选：添加 HEAD 请求支持，用于获取文件信息而不下载内容
 export async function HEAD(
     request: NextRequest,
-    { params }: RouteParams
+    context: { params: Promise<{ category: string; filename: string }> }
 ) {
-    const { category, filename } = params;
+    const { category, filename } = await context.params;
 
     if (!isValidPathSegment(category) || !isValidFilename(filename)) {
         return new NextResponse('invalid file', { status: 400 });

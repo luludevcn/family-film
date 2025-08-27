@@ -3,12 +3,9 @@ import { Image, Link } from '@heroui/react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export default function videoPage() {
+export default function VideoPage() {
     const { filename, category } = useParams<{ filename: string, category: string }>();
     const [videos, setVideos] = useState([]);
-    if (!filename) {
-        return <div>Loading...</div>;
-    }
 
     const videoSrc = `/api/video/${category}/${encodeURIComponent(filename)}`;
 

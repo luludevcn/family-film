@@ -2,17 +2,11 @@ import fs from "fs";
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 
-interface RouteParams {
-    params: {
-        category: string;
-    };
-}
-
 export async function GET(
     request: NextRequest,
-    { params }: RouteParams
+    context: { params: Promise<{ category: string; }> }
 ) {
-    const { category } = await params;
+    const { category } = await context.params;
     const MOVIES_BASE_DIR = process.env.MOVIE_DIR || '/path/to/your/movies';
     try {
         const catogaryFiles = fs.readdirSync(path.join(MOVIES_BASE_DIR, category))
